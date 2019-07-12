@@ -35,6 +35,8 @@ window.onload = function () {
 
         setTimeout(() => {
             // TODO: 写当游戏时间结束后要发生的事
+            timeUp = true;
+            titleH1.textContent="TIME UP!";
         }, gameTime)
     }
 
@@ -43,13 +45,17 @@ window.onload = function () {
      */
     function resetScoreAndTime() {
         // TODO: 写游戏的初始化设置
+        scoreBoard.textContent = 0;
+        timeUp = false;
+        score = 0;
+        gameTime = 10000;
     }
 
     /**
      * 出洞.
      */
     function peep() {
-        const time = randomTime(200, 1000);
+        const time = randomTime(500, 1000);
         const hole = randomHole(holes);
         comeOutAndStop(hole, time);
     }
@@ -63,7 +69,8 @@ window.onload = function () {
      */
     function randomTime(min, max) {
         // TODO: 写生成随机数的逻辑，
-        return 0;
+        return Math.round(min + Math.random() * (max - min));
+        //return 0;
     }
 
     /**
@@ -74,7 +81,13 @@ window.onload = function () {
      */
     function randomHole(holes) {
         // TODO: 写地鼠随机选择钻出地洞的逻辑，如果与上一个是相同地洞，则重新选择一个地洞.
-        return null;
+        let n = Math.floor(Math.random() * holes.length);
+        while (lastHole != undefined && n == lastHole) {
+            n = Math.floor(Math.random() * holes.length);
+        }
+        lastHole = n;
+        const hole = holes[n];
+        return hole;
     }
 
     /**
@@ -85,6 +98,14 @@ window.onload = function () {
      */
     function comeOutAndStop(hole, time) {
         // TODO: 写地鼠出洞并停留相应时间，如果游戏时间未结束(timeUp)，继续出洞(peep).
+
+        hole.classList.add('up');
+        setTimeout(() => {
+            hole.classList.remove('up');
+            if (!timeUp) {
+                peep();
+            }
+        }, time);
     }
 
     /**
@@ -92,6 +113,10 @@ window.onload = function () {
      */
     moles.forEach(mole => mole.addEventListener('click', function (e) {
         // TODO: 在这里写用户点击地鼠发生的事.
+        if (!e.isTrusted) return;
+        score++;
+        this.parentNode.classList.remove('up');
+        scoreBoard.textContent = score;
     }));
 
 };
